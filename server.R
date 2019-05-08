@@ -21,8 +21,11 @@ shinyServer(function(input, output) {
   
   
   output$plot1 <- renderPlotly({
-    #if (input$selectize)
-    data <- data[data$geography %in% input$selectize & (data$week >= input$slider[1] & data$week <= input$slider[2]), ]
+    
+    #select data based on weeks chosen
+    data <- data[data$geography %in% input$selectize & 
+                   (data$week >= input$slider[1] & 
+                      data$week <= input$slider[2]), ]
 
     coms <- unique(data$commodity)
     
@@ -30,6 +33,7 @@ shinyServer(function(input, output) {
     colnames(sales) <- coms
     
     
+    #explore effect coupons have on sales 
     for (com in coms){
       sales[1, com] <- sum(data$dollar_sales[data$commodity == com &
                                                data$coupon == 1])
@@ -56,7 +60,9 @@ shinyServer(function(input, output) {
   
   output$plot2 <- renderPlotly({
     
-    data <- data[data$geography %in% input$selectize & (data$week >= input$slider[1] & data$week <= input$slider[2]), ]
+    data <- data[data$geography %in% input$selectize & 
+                   (data$week >= input$slider[1] & 
+                      data$week <= input$slider[2]), ]
     
     coms <- unique(data$commodity)
     b_names <- unique(data$brand)
@@ -64,6 +70,7 @@ shinyServer(function(input, output) {
     sales <- data.frame(matrix(ncol = length(coms), nrow = 2))
     colnames(sales) <- coms
     
+    #explore top 5 brands including coupon effects on them
     brands0 <- data.frame(matrix(nrow = length(coms), ncol = length(b_names)))
     brands1 <- data.frame(matrix(nrow = length(coms), ncol = length(b_names)))
     rownames(brands0) <- coms
