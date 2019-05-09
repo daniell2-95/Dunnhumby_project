@@ -157,7 +157,7 @@ shinyServer(function(input, output) {
     
     for (w in weeks) {
       trips[w] <- (nrow(data1[data1$week == w, ]) / 
-                     nrow(data0[data0$week == w, ])) + 1
+                     nrow(data[data$week == w, ])) + 1
     }
     
     
