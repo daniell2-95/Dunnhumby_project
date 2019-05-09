@@ -13,6 +13,8 @@ library(dplyr)
 library(reshape2)
 library(plotly)
 library(data.table)
+library(rsconnect)
+library(bit64)
 
 
 
@@ -114,6 +116,58 @@ shinyServer(function(input, output) {
                xaxis = list(title = 'Dollar Sales'))
     }
   })
+  
+  output$plot3 <- renderPlotly({
+    
+    
+    data <- data[data$geography %in% input$selectize2 & 
+                   (data$week >= input$slider2[1] & 
+                      data$week <= input$slider2[2]) &
+                   data$commodity %in% input$variable2, ]
+    
+    
+    weeks <- unique(data$week)
+    
+    trips <- c()
+    
+    for (w in weeks) {
+      trips[w] <- nrow(data[data$week == w, ])
+    }
+    
+    
+    plot_ly(x = ~seq(input$slider2[1], input$slider2[2], by = 1), 
+            y = ~trips[input$slider2[1] : input$slider2[2]], mode = 'line') %>%
+      layout(yaxis = list(title = 'Number of Transactions'),
+             xaxis = list(title = 'Weeks'))
+  })
+  
+  output$plot4 <- renderPlotly({
+    
+    data <- data[data$geography %in% input$selectize2 & 
+                   (data$week >= input$slider2[1] & 
+                      data$week <= input$slider2[2]) &
+                   data$commodity %in% input$variable2, ]
+    
+    data1 <- data[data$coupon == 1, ]
+    data0 <- data[data$coupon == 0, ]
+    
+    weeks <- unique(data$week)
+    
+    trips <- c()
+    
+    for (w in weeks) {
+      trips[w] <- (nrow(data1[data1$week == w, ]) / 
+                     nrow(data0[data0$week == w, ])) + 1
+    }
+    
+    
+    plot_ly(x = ~seq(input$slider2[1], input$slider2[2], by = 1), 
+            y = ~trips[input$slider2[1] : input$slider2[2]], mode = 'line') %>%
+      layout(yaxis = list(title = 'Percent Change in Number of Transactions'),
+             xaxis = list(title = 'Weeks'))
+  })
+  
+    
   
   output$event <- renderPrint({
     d <- event_data("plotly_hover")
